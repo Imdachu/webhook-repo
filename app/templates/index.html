@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Actions Feed</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 2rem; }
+        .event { background: #fff; margin-bottom: 1rem; padding: 1rem; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+        .timestamp { color: #888; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+    <h2>GitHub Actions Feed</h2>
+    <div id="events"></div>
+    <script>
+        function formatEvent(event) {
+            const ts = new Date(event.timestamp).toUTCString();
+            if (event.action === "PUSH") {
+                return `<div class="event"><b>${event.author}</b> pushed to <b>${event.to_branch}</b> <span class="timestamp">on ${ts}</span></div>`;
+            }
+            if (event.action === "PULL_REQUEST") {
+                return `<div class="event"><b>${event.author}</b> submitted a pull request from <b>${event.from_branch}</b> to <b>${event.to_branch}</b> <span class="timestamp">on ${ts}</span></div>`;
+            }
+            if (event.action === "MERGE") {
+                return `<div class="event"><b>${event.author}</b> merged branch <b>${event.from_branch}</b> to <b>${event.to_branch}</b> <span class="timestamp">on ${ts}</span></div>`;
+            }
+            return "";
+        }
+
+        async function fetchEvents() {
+            const res = await fetch('/api/actions');
+            const data = await res.json();
+            document.getElementById('events').innerHTML = data.map(formatEvent).join('');
+        }
+
+        fetchEvents();
+        setInterval(fetchEvents, 15000);
+    </script>
+</body>
+</html> 
