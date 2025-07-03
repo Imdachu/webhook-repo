@@ -13,8 +13,18 @@
     <h2>GitHub Actions Feed</h2>
     <div id="events"></div>
     <script>
+        function toIST(utcString) {
+            const date = new Date(utcString);
+            // IST is UTC+5:30, so add 5.5 hours (19800 seconds)
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const istDate = new Date(date.getTime() + istOffset);
+            // Format as: 1 April 2021, 9:30 PM IST
+            const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
+            return istDate.toLocaleString('en-IN', options) + ' IST';
+        }
+
         function formatEvent(event) {
-            const ts = new Date(event.timestamp).toUTCString();
+            const ts = toIST(event.timestamp);
             if (event.action === "PUSH") {
                 return `<div class="event"><b>${event.author}</b> pushed to <b>${event.to_branch}</b> <span class="timestamp">on ${ts}</span></div>`;
             }
